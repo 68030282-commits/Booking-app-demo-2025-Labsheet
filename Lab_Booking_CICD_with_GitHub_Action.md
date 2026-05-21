@@ -440,7 +440,8 @@ model Booking {
 **คำถาม 2.1**: จาก schema นี้ ความสัมพันธ์ระหว่าง `Room` และ `Booking` เป็นแบบใด (one-to-one / one-to-many / many-to-many)? อธิบายเหตุผล
 
 ```plaintext
-# ตอบคำถามที่นี่
+ความสัมพันธ์ระหว่าง Room และ Booking ใน Schema นี้คือ One-to-Many (หนึ่งต่อกลุ่ม)
+ห้องพัก 1 ห้อง (Room): สามารถมีรายการจองได้หลายรายการ (bookings Booking[])การจอง 1 รายการ (Booking): ผูกกับห้องพักได้เพียงห้องเดียวเท่านั้น (room Room?) โดยอ้างอิงผ่าน roomId
 
 ```
 
@@ -644,7 +645,7 @@ curl http://localhost:3001/api/reports \
 ```plaintext
 # วาง output จาก curl ที่นี่
 
-
+{"bookings":[{"id":2,"fullname":"Somchai jaidee","email":"somchai@example.com","phone":"0987654321","checkin":"2025-08-01T00:00:00.000Z","checkout":"2025-08-03T00:00:00.000Z","roomtype":"standard","guests":2,"status":"pending","comment":null,"roomId":1,"createdAt":"2026-05-21T18:35:50.318Z","room":{"id":1,"roomType":"standard","name":"ห้องมาตรฐาน","description":"ห้องพักสำหรับ 1-2 ท่าน พร้อมสิ่งอำนวยความสะดวกพื้นฐาน","capacity":2,"price":1200,"createdAt":"2026-05-21T18:27:34.449Z"}},{"id":1,"fullname":"����� 㨴�","email":"somchai@example.com","phone":"0987654321","checkin":"2025-08-01T00:00:00.000Z","checkout":"2025-08-03T00:00:00.000Z","roomtype":"standard","guests":2,"status":"pending","comment":null,"roomId":1,"createdAt":"2026-05-21T18:34:13.596Z","room":{"id":1,"roomType":"standard","name":"ห้องมาตรฐาน","description":"ห้องพักสำหรับ 1-2 ท่าน พร้อมสิ่งอำนวยความสะดวกพื้นฐาน","capacity":2,"price":1200,"createdAt":"2026-05-21T18:27:34.449Z"}}],"summaryByRoom":{"ห้องมาตรฐาน":2},"summaryByStatus":{"pending":2},"totalNights":4,"totalBookings":2}
 
 ```
 
@@ -961,16 +962,34 @@ start newman-report.html       # Windows (Git Bash)
 
 **แนบรูปผลการทดสอบ Newman**:
 
-```plaintext
-# แนบ screenshot ผลการทดสอบที่นี่
-
-```
+![alt text](image.png)
 
 **คำถาม 4.3**: Newman tests ที่เขียนมีการทดสอบทั้ง positive cases (สำเร็จ) และ negative cases (ล้มเหลว) อธิบายให้ครบอย่างน้อย 2 ตัวอย่าง
 
 ```plaintext
-# ตอบคำถามที่นี่
+- Positive Case (Login - Success):
 
+สิ่งที่มีการทดสอบ: ส่ง username: "admin" และ password: "admin123" ซึ่งเป็นข้อมูลที่ถูกต้องไปยัง Endpoint POST /api/login
+
+การตรวจเช็ค (Assertions): ระบบตรวจสอบว่า HTTP Status Code ต้องได้รับกลับมาเป็น 200 (OK) และเช็คว่าต้องมีฟิลด์ token (JWT) ส่งกลับมาด้วย เพื่อนำไปเซ็ตลงในตัวแปรคอลเลกชัน (authToken) สำหรับใช้ใน Request ถัดไป
+
+- Negative Case (Login - Wrong Password):
+
+สิ่งที่มีการทดสอบ: จงใจส่งรหัสผ่านที่ผิดพลาดไปทดสอบ โดยเปลี่ยน password เป็น "wrongpassword"
+
+การตรวจเช็ค (Assertions): ตัว Newman จะเช็คว่าระบบบล็อกการเข้าถึงและตีกลับมาเป็น HTTP Status Code 401 (Unauthorized) หรือไม่ เพื่อพิสูจน์ว่าระบบมีความปลอดภัยและไม่ยอมให้รหัสผ่านที่ผิดผ่านเข้ามาได้
+
+- Positive Case (Get Reports (Admin)):
+
+สิ่งที่มีการทดสอบ: เรียกใช้งาน Endpoint GET /api/reports โดยมีการแนบ Authorization: Bearer {{authToken}} (Token ที่ได้มาจากการ Login สำเร็จในเคสแรก) ไปใน Header ของ Request ด้วย
+
+การตรวจเช็ค (Assertions): เนื่องจากมี Token ยืนยันตัวตนถูกต้อง Newman จะตรวจสอบว่าระบบต้องอนุญาตให้เข้าถึงข้อมูลได้ และตอบกลับด้วย HTTP Status Code 200
+
+- Negative Case (Export Reports - Unauthorized):
+
+สิ่งที่มีการทดสอบ: พยายามดึงข้อมูลรายงานผ่าน Endpoint GET /api/reports/export แต่จงใจไม่ส่ง Header สำหรับยืนยันตัวตน (Authorization) ไปพร้อมกับ Request
+
+การตรวจเช็ค (Assertions): Newman จะตรวจสอบความปลอดภัยของ API ว่า หากไม่มีการแนบ Token ระบบต้องทำการปฏิเสธทันที โดยส่ง HTTP Status Code 401 ออกมา เพื่อป้องกันไม่ให้บุคคลภายนอกที่ไม่มีสิทธิ์เข้ามาแอบดึงข้อมูลรายงานออกไปได้
 ```
 
 ---
@@ -995,8 +1014,27 @@ Workflow ที่มีอยู่ใช้ self-hosted runner และทำ
 **คำถาม 5.1**: ทำไม workflow ปัจจุบันถึงใช้ `self-hosted` runner? มีข้อดีข้อเสียอะไรเมื่อเทียบกับ `ubuntu-latest`?
 
 ```plaintext
-# ตอบคำถามที่นี่
+ทำไม Workflow ปัจจุบันถึงเลือก Self-hosted runner?
+เหตุผลหลักมักจะสรุปได้เป็น 3 ข้อ:
 
+- ความปลอดภัยในระบบปิด (Secure Network): ตัว Runner อยู่ใน Network หรือ VM ของเราเอง เวลาจะ Deploy งานเข้า Server หรือ Database ภายในองค์กร จึงทำได้ทันทีอย่างปลอดภัย ไม่ต้องเปิดช่องโหว่ (Firewall) ให้คนนอกเข้า
+
+- บิวด์เร็วขึ้นด้วย Local Cache: เครื่องเป็นของเราเอง ทำให้สามารถเก็บ Cache ของ Docker images หรือ Dependencies (เช่น node_modules) ไว้ในดิสก์ได้เลย ไม่ต้องดาวน์โหลดใหม่ทุกรอบเหมือนเครื่องของ GitHub
+
+- ควบคุมค่าใช้จ่ายได้ดีกว่า (Fixed Cost): จ่ายค่าเช่า Server เป็นรายเดือนในราคาคงที่ เหมาะมากกับทีมที่ต้องรันบิวด์บ่อยๆ ทั้งวัน เพราะรันเท่าไหร่ค่าบริการ GitHub ก็ไม่เพิ่มขึ้น
+
+2. เปรียบเทียบข้อดี-ข้อเสีย
+GitHub-hosted (ubuntu-latest)
+
+ข้อดี: สบายสุดๆ ไม่ต้องลงโปรแกรม ไม่ต้องอัปเดต OS ทาง GitHub จัดการให้หมด เครื่องสะอาดทุกครั้งที่รัน
+
+ข้อเสีย: สเปกเริ่มต้นค่อนข้างต่ำ (2 vCPU / RAM 7GB) หากโปรเจกต์ใหญ่จะบิวด์ช้า และถ้าใช้เกินโควต้าฟรี จะคิดเงินเป็นรายนาที ซึ่งถ้าบิวด์บ่อยๆ บิลจะแพงมาก
+
+Self-hosted runner (เครื่องของเราเอง)
+
+ข้อดี: แรงและยืดหยุ่น อยากได้ CPU/RAM เยอะแค่ไหน หรืออยากใส่ GPU ก็จัดเองได้ตามงบ และเชื่อมต่อระบบภายในได้ปลอดภัย
+
+ข้อเสีย: เป็นภาระ ต้องมีคนคอยดูแลระบบ คอยอัปเดต Patch และต้องคอยลบไฟล์ขยะ (Clear Disk) ไม่ให้ดิสก์เต็มจน Workflow ล่มครับ
 ```
 
 ### ขั้นตอนที่ 5.2: วิเคราะห์ข้อจำกัดของ Workflow ปัจจุบัน
