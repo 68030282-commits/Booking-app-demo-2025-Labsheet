@@ -645,7 +645,36 @@ curl http://localhost:3001/api/reports \
 ```plaintext
 # วาง output จาก curl ที่นี่
 
-{"bookings":[{"id":2,"fullname":"Somchai jaidee","email":"somchai@example.com","phone":"0987654321","checkin":"2025-08-01T00:00:00.000Z","checkout":"2025-08-03T00:00:00.000Z","roomtype":"standard","guests":2,"status":"pending","comment":null,"roomId":1,"createdAt":"2026-05-21T18:35:50.318Z","room":{"id":1,"roomType":"standard","name":"ห้องมาตรฐาน","description":"ห้องพักสำหรับ 1-2 ท่าน พร้อมสิ่งอำนวยความสะดวกพื้นฐาน","capacity":2,"price":1200,"createdAt":"2026-05-21T18:27:34.449Z"}},{"id":1,"fullname":"����� 㨴�","email":"somchai@example.com","phone":"0987654321","checkin":"2025-08-01T00:00:00.000Z","checkout":"2025-08-03T00:00:00.000Z","roomtype":"standard","guests":2,"status":"pending","comment":null,"roomId":1,"createdAt":"2026-05-21T18:34:13.596Z","room":{"id":1,"roomType":"standard","name":"ห้องมาตรฐาน","description":"ห้องพักสำหรับ 1-2 ท่าน พร้อมสิ่งอำนวยความสะดวกพื้นฐาน","capacity":2,"price":1200,"createdAt":"2026-05-21T18:27:34.449Z"}}],"summaryByRoom":{"ห้องมาตรฐาน":2},"summaryByStatus":{"pending":2},"totalNights":4,"totalBookings":2}
+- curl http://localhost:3001/api/rooms
+[{"id":2,"roomType":"deluxe","name":"ห้องดีลักซ์","description":"พื้นที่กว้างขึ้น เหมาะสำหรับ 2-3 ท่าน","capacity":3,"price":1800,"createdAt":"2026-05-21T20:34:40.687Z"},{"id":1,"roomType":"standard","name":"ห้องมาตรฐาน","description":"ห้องพักสำหรับ 1-2 ท่าน พร้อมสิ่งอำนวยความสะดวกพื้นฐาน","capacity":2,"price":1200,"createdAt":"2026-05-21T20:34:40.685Z"},{"id":3,"roomType":"suite","name":"ห้องสวีท","description":"ห้องพักขนาดใหญ่สำหรับครอบครัวหรือกลุ่ม","capacity":4,"price":2500,"createdAt":"2026-05-21T20:34:40.688Z"}]
+
+- curl -X POST http://localhost:3001/api/bookings \
+  -H "Content-Type: application/json" \
+  -d '{
+    "guestName": "Somchai Jaidee",
+    "guestEmail": "somchai@example.com",
+    "phone": "0987654321",
+    "roomId": 1,
+    "guests": "2",
+    "checkIn": "2025-08-01",
+    "checkOut": "2025-08-03"
+  }'
+{"id":1,"fullname":"Somchai Jaidee","email":"somchai@example.com","phone":"0987654321","checkin":"2025-08-01T00:00:00.000Z","checkout":"2025-08-03T00:00:00.000Z","roomtype":"standard","guests":2,"status":"pending","comment":null,"roomId":1,"createdAt":"2026-05-21T20:37:30.477Z"}
+
+- curl -X POST http://localhost:3001/api/login \
+  -H "Content-Type: application/json" \
+  -d '{"username": "admin", "password": "admin123"}'
+{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzc5Mzk1ODYwLCJleHAiOjE3Nzk0ODIyNjB9._045hefulzE4L79WTHn6s5hW1bBbVmdqRwWpg8CRoKI","user":{"id":1,"username":"admin","role":"admin"}}
+
+- export TOKEN="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzc5Mzk1ODYwLCJleHAiOjE3Nzk0ODIyNjB9._045hefulzE4L79WTHn6s5hW1bBbVmdqRwWpg8CRoKI"
+
+- curl http://localhost:3001/api/bookings \
+  -H "Authorization: Bearer $TOKEN"
+[{"id":1,"fullname":"Somchai Jaidee","email":"somchai@example.com","phone":"0987654321","checkin":"2025-08-01T00:00:00.000Z","checkout":"2025-08-03T00:00:00.000Z","roomtype":"standard","guests":2,"status":"pending","comment":null,"roomId":1,"createdAt":"2026-05-21T20:37:30.477Z","room":{"id":1,"roomType":"standard","name":"ห้องมาตรฐาน","description":"ห้องพักสำหรับ 1-2 ท่าน พร้อมสิ่งอำนวยความสะดวกพื้นฐาน","capacity":2,"price":1200,"createdAt":"2026-05-21T20:34:40.685Z"}}]
+
+- curl http://localhost:3001/api/reports \
+  -H "Authorization: Bearer $TOKEN"
+{"bookings":[{"id":1,"fullname":"Somchai Jaidee","email":"somchai@example.com","phone":"0987654321","checkin":"2025-08-01T00:00:00.000Z","checkout":"2025-08-03T00:00:00.000Z","roomtype":"standard","guests":2,"status":"pending","comment":null,"roomId":1,"createdAt":"2026-05-21T20:37:30.477Z","room":{"id":1,"roomType":"standard","name":"ห้องมาตรฐาน","description":"ห้องพักสำหรับ 1-2 ท่าน พร้อมสิ่งอำนวยความสะดวกพื้นฐาน","capacity":2,"price":1200,"createdAt":"2026-05-21T20:34:40.685Z"}}],"summaryByRoom":{"ห้องมาตรฐาน":1},"summaryByStatus":{"pending":1},"totalNights":2,"totalBookings":1}
 
 ```
 
@@ -1541,10 +1570,7 @@ git push origin main
 
 **แนบรูป GitHub Actions Workflow ที่ผ่านทั้งหมด**:
 
-```plaintext
-# แนบ screenshot ที่นี่
-
-```
+![alt text](image-1.png)
 
 ---
 
@@ -1787,9 +1813,46 @@ curl -I $BACKEND/api/rooms
 **บันทึกผลการทดสอบบน Production**:
 
 ```plaintext
-# วาง output ที่นี่
+export BACKEND=https://booking-backend-bmbd.onrender.com
+
+- curl $BACKEND/api/rooms
+[{"id":2,"roomType":"deluxe","name":"ห้องดีลักซ์","description":"พื้นที่กว้างขึ้น เหมาะสำหรับ 2-3 ท่าน","capacity":3,"price":1800,"createdAt":"2026-05-21T19:27:05.911Z"},{"id":33,"roomType":"Deluxe-15701","name":"Deluxe Room 15701","description":"Deluxe room with premium amenities","capacity":2,"price":1500,"createdAt":"2026-05-21T21:30:26.432Z"},{"id":26,"roomType":"Deluxe-16655","name":"Deluxe Room 16655","description":"Deluxe room with premium amenities","capacity":2,"price":1500,"createdAt":"2026-05-21T21:25:44.284Z"},{"id":19,"roomType":"Deluxe-51232","name":"Deluxe Room 51232","description":"Deluxe room with premium amenities","capacity":2,"price":1500,"createdAt":"2026-05-21T21:16:02.846Z"},{"id":1,"roomType":"standard","name":"ห้องมาตรฐาน","description":"ห้องพักสำหรับ 1-2 ท่าน พร้อมสิ่งอำนวยความสะดวกพื้นฐาน","capacity":2,"price":1200,"createdAt":"2026-05-21T19:27:05.907Z"},{"id":3,"roomType":"suite","name":"ห้องสวีท","description":"ห้องพักขนาดใหญ่สำหรับครอบครัวหรือกลุ่ม","capacity":4,"price":2500,"createdAt":"2026-05-21T19:27:05.914Z"}]
+
+- curl -s -X POST $BACKEND/api/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}'
+{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3OTM5OTk5OSwiZXhwIjoxNzc5NDAzNTk5fQ.4uTWipfC6tbvKyY4sgH3D8IV0BiimD0a2Si4POY4bpg","user":{"id":1,"username":"admin","role":"admin"}}
+
+- export TOKEN="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3OTM5OTk5OSwiZXhwIjoxNzc5NDAzNTk5fQ.4uTWipfC6tbvKyY4sgH3D8IV0BiimD0a2Si4POY4bpg"
+
+- curl $BACKEND/api/bookings \
+  -H "Authorization: Bearer $TOKEN"
+[{"id":1,"fullname":"ศุภโชค หอมสมบัติ","email":"68030282@kmitl.ac.th","phone":"0958217460","checkin":"2026-06-18T00:00:00.000Z","checkout":"2026-06-21T00:00:00.000Z","roomtype":"standard","guests":2,"status":"pending","comment":null,"roomId":1,"createdAt":"2026-05-21T21:40:28.081Z","room":{"id":1,"roomType":"standard","name":"ห้องมาตรฐาน","description":"ห้องพักสำหรับ 1-2 ท่าน พร้อมสิ่งอำนวยความสะดวกพื้นฐาน","capacity":2,"price":1200,"createdAt":"2026-05-21T19:27:05.907Z"}}]
+
+- curl $BACKEND/api/reports \
+  -H "Authorization: Bearer $TOKEN"
+{"bookings":[{"id":1,"fullname":"ศุภโชค หอมสมบัติ","email":"68030282@kmitl.ac.th","phone":"0958217460","checkin":"2026-06-18T00:00:00.000Z","checkout":"2026-06-21T00:00:00.000Z","roomtype":"standard","guests":2,"status":"pending","comment":null,"roomId":1,"createdAt":"2026-05-21T21:40:28.081Z","room":{"id":1,"roomType":"standard","name":"ห้องมาตรฐาน","description":"ห้องพักสำหรับ 1-2 ท่าน พร้อมสิ่งอำนวยความสะดวกพื้นฐาน","capacity":2,"price":1200,"createdAt":"2026-05-21T19:27:05.907Z"}}],"summaryByRoom":{"ห้องมาตรฐาน":1},"summaryByStatus":{"pending":1},"totalNights":3,"totalBookings":1}
+
+- curl -I $BACKEND/api/rooms
+HTTP/1.1 200 OK
+Date: Thu, 21 May 2026 21:47:18 GMT
+Content-Type: application/json; charset=utf-8
+Connection: keep-alive
+access-control-allow-origin: *
+etag: W/"548-o71FjW3EzopmEEGKiwHlYFbefyU"
+rndr-id: e42a9d86-5c55-4ceb
+Server: cloudflare
+vary: Accept-Encoding
+x-powered-by: Express
+x-render-origin-server: Render
+cf-cache-status: DYNAMIC
+CF-RAY: 9ff6c760681f45b1-BKK
+alt-svc: h3=":443"; ma=86400
 
 ```
+![alt text](image-2.png)
+![alt text](image-3.png)
+![alt text](image-4.png)
 
 ### ขั้นตอนที่ 9.6: ทดสอบ Auto-Deployment (สำคัญ)
 
@@ -2350,8 +2413,45 @@ done
 **คำถาม 10.3**: หลังจากตั้งค่า Helmet แล้ว ให้รัน `curl -I http://localhost:3001/api/rooms` และบันทึก headers ที่ได้ อธิบายว่า header แต่ละตัวป้องกันการโจมตีแบบใด
 
 ```plaintext
-# บันทึก headers และคำอธิบายที่นี่
+curl -I http://localhost:3001/api/rooms
+HTTP/1.1 200 OK
+Content-Security-Policy: default-src 'self';script-src 'self';style-src 'self' 'unsafe-inline';img-src 'self' data: https:;base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+Origin-Agent-Cluster: ?1
+Referrer-Policy: no-referrer
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-DNS-Prefetch-Control: off
+X-Download-Options: noopen
+X-Frame-Options: DENY
+X-Permitted-Cross-Domain-Policies: none
+X-XSS-Protection: 0
+Vary: Origin
+Access-Control-Allow-Credentials: true
+RateLimit-Policy: 100;w=900
+RateLimit-Limit: 100
+RateLimit-Remaining: 99
+RateLimit-Reset: 900
+Content-Type: application/json; charset=utf-8
+Content-Length: 1171
+ETag: W/"493-ISCUcErtv1o/5Bf8G0t6o6vi9VA"
+Date: Thu, 21 May 2026 22:15:55 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
 
+Content-Security-Policy (CSP): ป้องกันการฝังโค้ดสคริปต์แฝง (XSS) โดยล็อกแหล่งดาวน์โหลดที่เชื่อถือได้
+X-Frame-Options: DENY ป้องกัน Clickjacking (ห้ามเว็บอื่นเอาเว็บเราไปครอบฝังใน iframe เพื่อหลอกให้กด)
+Strict-Transport-Security (HSTS): บังคับเชื่อมต่อผ่าน HTTPS เท่านั้น ป้องกันการดักฟังข้อมูลระหว่างทาง
+X-Content-Type-Options: nosniff บังคับให้เบราว์เซอร์อ่านไฟล์ตามที่ระบุ ห้ามเดาหรือแปลงไฟล์ข้อความเป็นสคริปต์
+Referrer-Policy: no-referrer ซ่อน URL ต้นทางเมื่อกดลิงก์ออกไปข้างนอก ป้องกัน ข้อมูลส่วนตัวรั่วไหล
+COOP / CORP / Origin-Agent-Cluster: แยกโปรเซสและหน่วยความจำออกจากเว็บอื่น ป้องกันการแอบดักอ่านข้อมูลข้ามเว็บ
+X-Download-Options / X-Permitted...: ป้องกันช่องโหว่และบล็อกความเสี่ยงจากปลั๊กอินหรือเบราว์เซอร์รุ่นเก่า
+X-XSS-Protection: 0 ปิดตัวกรอง XSS รุ่นเก่า เพื่อไปใช้ระบบ CSP ที่ปลอดภัยกว่า
+
+เสริมตัวอื่นใน Log (ไม่ใช่ของ Helmet)
+RateLimit-*: ป้องกันการยิงถล่มเซิร์ฟเวอร์ (DDoS / Brute Force) โดยจำกัดจำนวนครั้งในการกดเรียก API
+Content-Type: ยืนยันว่าข้อมูลนี้ส่งกลับไปเป็นฟอร์แมต JSON เสมอ
 ```
 
 ---
@@ -2541,23 +2641,49 @@ options: >-
 อธิบายความแตกต่างระหว่าง Continuous Integration (CI) และ Continuous Deployment (CD) พร้อมยกตัวอย่างจาก workflow ที่สร้างในการทดลองนี้
 
 ```plaintext
-# ตอบที่นี่
+Continuous Integration (CI): คือกระบวนการที่เน้นการ รวมโค้ด จากนักพัฒนาหลายคนเข้าสู่ Branch หลักโดยอัตโนมัติ สิ่งที่ทำคือทุกครั้งที่มีการ Commit/Push โค้ด ระบบจะรันกระบวนการ Build, ตรวจสอบ Code Syntax, และรัน Automation Tests ทันทีเพื่อหาบั๊กและข้อผิดพลาดให้เร็วที่สุด
 
+ตัวอย่างใน workflow: ขั้นตอนการรัน npm test หรือการรันสคริปต์สแกนช่องโหว่ความปลอดภัย เช่น TruffleHog และ npm audit บน GitHub Actions ทันทีที่มีการเปิด Pull Request เข้าหา Branch develop หรือ staging
+
+Continuous Deployment (CD): คือกระบวนการที่เน้นการ นำโค้ดขึ้นระบบ (Deploy) ไปยังสภาพแวดล้อมต่าง ๆ (เช่น Staging หรือ Production) โดยอัตโนมัติ หลังจากที่ขั้นตอน CI ผ่านการตรวจสอบทั้งหมดแล้ว โดยไม่จำเป็นต้องมีมนุษย์มากดปุ่ม Approve เอง
+
+ตัวอย่างใน workflow: ขั้นตอนที่ GitHub Actions ส่งโค้ดที่รันเทสผ่านแล้วไปอัปเดตที่ Vercel (Frontend) และ Render (Backend) แบบอัตโนมัติ ทันทีที่มีการ Merge โค้ดเข้าสู่ Branch staging หรือ main
 ```
 
 **คำถาม 2 — Multi-Service Architecture**:
 ในโปรเจกต์นี้ Frontend และ Backend ถูก deploy แยกกัน (Vercel vs Render) มีข้อดีและข้อเสียอะไรเมื่อเทียบกับการ deploy บน server เดียวกัน?
 
 ```plaintext
-# ตอบที่นี่
+ข้อดี 
+Scalability (การขยายระบบ): สามารถแยกขยายทรัพยากร (Scale) ของฝั่งที่มีผู้ใช้งานหนาแน่นได้อิสระ เช่น ถ้าผู้ใช้เข้าหน้าเว็บเยอะแต่ไม่ได้ดึงข้อมูล API มาก เราก็สเกลแค่ทรัพยากรฝั่ง Frontend บน Vercel ได้โดยไม่ต้องเปลืองเงินสเกลเครื่อง Backend
 
+Resource Isolation & Fault Isolation: หากเกิดข้อผิดพลาดรุนแรงที่ทำให้ฝั่ง Backend ค้างหรือล่ม (เช่น Memory Leak บน Render) หน้าต่างและระบบ Frontend บน Vercel จะยังคงทำงานได้ตามปกติ ไม่ล่มตามไปด้วย ทำให้ผู้ใช้ยังเห็นหน้าเว็บและได้ข้อความแจ้งเตือนที่เหมาะสม (Better UX)
+
+Platform Optimization: ได้ใช้คลาวด์ที่เชี่ยวชาญเฉพาะด้าน เช่น Vercel จัดการเรื่อง Static Files / Serverless Frontend ได้เร็วผ่าน CDN ทั่วโลก ส่วน Render ก็จัดการเว็บเซิร์ฟเวอร์แบบ Dynamic ได้ดี
+
+ข้อเสีย
+latency (ความหน่วง): การดึงข้อมูลช้ากว่าการอยู่บนเซิร์ฟเวอร์เดียวกัน เนื่องจาก Frontend และ Backend ต้องสื่อสารกันผ่านเครือข่ายอินเทอร์เน็ต (Network Call) ข้ามระบบคลาวด์
+
+ความซับซ้อนในการจัดการ: ต้องตั้งค่าระบบความปลอดภัยเพิ่มเติม เช่น การจัดการนโยบาย CORS (Cross-Origin Resource Sharing) เพื่ออนุญาตให้โดเมนของ Vercel คุยกับ Render ได้ และต้องดูแล URL/Domain และ Environment Variables แยกกัน 2 ชุด
 ```
 
 **คำถาม 3 — API Testing vs Smoke Testing**:
 Newman CI tests ต่างจาก Post-Deploy Smoke Tests อย่างไร? ทำไมถึงต้องมีทั้งสองแบบ? ยกตัวอย่างสถานการณ์ที่ CI tests ผ่านแต่ Smoke Tests ล้มเหลวได้หรือไม่?
 
 ```plaintext
-# ตอบที่นี่
+ความแตกต่าง:
+
+Newman CI tests: รันในขั้นตอนที่โค้ดยังไม่ถูก deploy (จำลองสภาพแวดล้อมขึ้นมาใน Runner ของ GitHub Actions เช่น รันบน localhost) เน้นตรวจความถูกต้องของ Logic โค้ด โครงสร้าง API และฟังก์ชันการทำงานเป็นหลัก
+
+Post-Deploy Smoke Tests: รันหลังจากที่โค้ดถูก deploy ขึ้นไปยัง Server จริง (เช่น โดเมนของ Render/Vercel) แล้ว เพื่อตรวจสอบความพร้อมทำงานเบื้องต้นว่าระบบภาพรวมเปิดใช้งานได้จริง และเชื่อมต่อสิ่งแวดล้อมภายนอกได้ครบถ้วน
+
+ทำไมต้องมีทั้งสองแบบ: เพราะ CI tests ไม่สามารถตรวจสอบปัญหาด้านโครงสร้างพื้นฐาน (Infrastructure) ของเซิร์ฟเวอร์จริงได้ ส่วน Smoke Tests ก็ไม่ได้ลงลึกไปตรวจเคสของ API ทุกตัวอย่างละเอียด จึงต้องใช้ร่วมกันเพื่อปิดช่องโหว่ความผิดพลาด
+
+สถานการณ์ที่ CI ผ่าน แต่ Smoke Tests พัง:
+
+เคสที่ 1 (Env missing): ทีมงานลืมตั้งค่า Environment Variables (เช่น ค่า DATABASE_URL) บนระบบของ Render จริง ทำให้เซิร์ฟเวอร์คลาวด์เปิดใช้งานไม่ได้ แต่ตอนรันบน CI ผ่านเพราะ CI ใช้ค่าจำลองจากเครื่อง Runner
+
+เคสที่ 2 (Database Firewall): ระบบฐานข้อมูลคลาวด์ที่ Render ต่ออยู่ มีการปิดกั้น IP หรือเกิดสิทธิ์การเข้าถึงไม่ได้ (Authentication Error) ทำให้เว็บใช้งานจริงพัง ทั้ง ๆ ที่ตัว Logic ของโค้ดที่รันบน CI ไม่มีอะไรผิดพลาด
 
 ```
 
@@ -2575,15 +2701,23 @@ Newman CI tests ต่างจาก Post-Deploy Smoke Tests อย่างไ
 | CI Pipeline | OWASP Dep-Check | ? |
 
 ```plaintext
-# ตอบที่นี่
 
+Helmet.js: "ป้องกัน XSS, Clickjacking, MIME Sniffing" ทำหน้าที่ตั้งค่า HTTP Security Headers ที่ปลอดภัย เพื่อควบคุมพฤติกรรมของเบราว์เซอร์ไม่ให้รันโค้ดแปลกปลอมหรือโดนหลอกครอบหน้าต่างเว็บ
+express-rate-limit: "ป้องกัน Brute Force Attacks, DDoS, API Abuse" ทำหน้าที่จำกัดจำนวนครั้ง (Requests) ที่ผู้ใช้รายหนึ่งจะกดเรียกใช้งาน API ได้ในช่วงเวลาที่กำหนด เพื่อป้องกันการยิงถล่มเซิร์ฟเวอร์
+CORS: ป้องกัน Cross-Origin Unauthorized Requests ควบคุมสิทธิ์และสกัดกั้นไม่ให้เว็บไซต์แปลกปลอม (โดเมนอื่น) แอบยิงดักข้อมูลหรือส่งคำสั่งสั่งงานมาที่ API Backend ของเรา
+bcryptjs: "ป้องกัน Credential Leaks, Rainbow Table Attacks" ทำหน้าที่เข้ารหัสรหัสผ่าน (Password Hashing) พร้อมใส่เกลือ (Salting) ก่อนบันทึกลงฐานข้อมูล เพื่อที่หากฐานข้อมูลรั่วไหล แฮกเกอร์ก็จะไม่เห็นรหัสผ่านตัวจริง
+npm audit: ป้องกัน Vulnerable Dependencies (Supply Chain Attacks)สแกนหาช่องโหว่ด้านความปลอดภัยภายใน Third-party Packages (ไลบรารีต่าง ๆ ใน node_modules) ที่เรานำมาใช้ในโปรเจกต์
+TruffleHog: ป้องกัน Secret Leakage (ข้อมูลสำคัญหลุด),"สแกนตรวจหาและแจ้งเตือนทันทีหากนักพัฒนาเผลอเขียนค่าความลับ เช่น API Keys, Passwords หรือ Token ลงไปในเนื้อโค้ดที่กำลังจะ Push"
+OWASP Dep-Check: ป้องกัน Known Vulnerabilities (CVEs) ตรวจสอบข้อมูลแพ็กเกจที่ใช้อยู่เทียบกับฐานข้อมูลช่องโหว่สากล (OWASP) เพื่อเตือนให้รีบอัปเดตเวอร์ชันของไลบรารีที่เก่าและอันตราย
 ```
 
 **คำถาม 5 — Secrets Management**:
 เหตุใดจึงต้องใช้ GitHub Secrets แทนการเขียนค่า credentials โดยตรงใน workflow YAML file? ถ้าใส่ค่า JWT_SECRET ตรงๆ ใน YAML จะเกิดอะไรขึ้น?
 
 ```plaintext
-# ตอบที่นี่
+เหตุผลที่ต้องใช้ GitHub Secrets: เพราะระบบต้องการการจัดการข้อมูลความลับที่ปลอดภัย (Encrypted Secrets) ข้อมูลที่บันทึกในนี้จะถูกเข้ารหัสและจะไม่แสดงให้เห็นบนหน้าจอ Git Log หรือบนหน้าเว็บทั่วไป แม้ว่าโปรเจกต์นั้นจะเป็น Open Source (Public Repository) ก็ตาม ทำให้นักพัฒนาสามารถดึงไปใช้รัน Pipeline ได้โดยไม่เสี่ยงต่อข้อมูลรั่วไหล
+ถ้าใส่ค่า JWT_SECRET ตรง ๆ ใน YAML จะเกิดอะไรขึ้น?: 1.  ข้อมูลความลับจะรั่วไหล (Exposed): ทุกคนที่สามารถเข้าถึงหรือมองเห็น Repository นี้ได้ (รวมถึงประวัติ Git History ย้อนหลัง) จะเห็นรหัสลับตัวนี้ทันที
+2.  ระบบความปลอดภัยพังทลาย: แฮกเกอร์สามารถแกะเอา JWT_SECRET ตัวนี้ไปใช้ปลอมแปลงสิทธิ์ (Forge Tokens) เป็นผู้ใช้งานคนใดก็ได้ในระบบ หรือเป็นแอดมิน เพื่อเข้าไปขโมยหรือทำลายข้อมูลในระบบของ booking-app-demo ได้โดยง่าย
 
 ```
 
@@ -2591,7 +2725,16 @@ Newman CI tests ต่างจาก Post-Deploy Smoke Tests อย่างไ
 อธิบาย Git Flow ที่ใช้ในโปรเจกต์นี้ (develop → staging → main) ทำไมต้องมีหลาย environment แทนที่จะ deploy ตรงจาก develop ไป production เลย?
 
 ```plaintext
-# ตอบที่นี่
+อธิบาย Git Flow ในระบบนี้:
+
+develop: บรันช์สำหรับรวบรวมฟีเจอร์ใหม่ ๆ ที่นักพัฒนาทำร่วมกัน (สอดคล้องกับ Development Environment สำหรับการทดสอบโค้ดภายในทีมเดฟ)
+
+staging: บรันช์จำลองสภาวะแวดล้อมที่เหมือนกับของจริงร้อยเปอร์เซ็นต์ (Staging Environment) เพื่อให้ทีม Tester หรือ QA ทำการทดสอบระบบภาพรวมและทำ Smoke Tests ก่อนเปิดใช้งานจริง
+
+main: บรันช์สูงสุดที่เป็นเสถียรภาพที่สุด ซึ่งจะผูกเข้ากับระบบจริง (Production Environment) ที่ลูกค้าหรือผู้ใช้งานทั่วไปใช้งานจริง
+
+ทำไมต้องมีหลาย Environment (ไม่ขึ้นตรงไป Production):
+เพื่อสร้าง "ระบบคัดกรองความผิดพลาด (Safety Net)" เพราะหากเรา Deploy ตรงจาก develop ไปยัง Production เลย บั๊กที่เกิดจากการเขียนโค้ดชนกัน ความผิดพลาดของระบบเน็ตเวิร์ก หรือความเสียหายที่ยังตรวจไม่เจอ จะส่งผลกระทบถึงผู้ใช้งานทั่วไป (End Users) ทันที ส่งผลให้ระบบล่มและธุรกิจเสียหาย การมี staging คั่นกลางจะช่วยให้เราสามารถทดสอบและแน่ใจได้ว่าระบบทำงานได้สมบูรณ์แบบบนสภาพแวดล้อมเสมือนจริง ก่อนที่จะส่งมอบงานที่ปลอดภัยที่สุดให้กับผู้ใช้จริง
 
 ```
 
